@@ -28,10 +28,10 @@ func Decode(byteReader *bytes.Buffer, encoding string) (data []byte, err error) 
 
 func getRawReader(byteReader *bytes.Buffer, encoding string) (io.Reader, error) {
 	switch encoding {
-	case "gzip":
+	case Gzip:
 		return gzip.NewReader(byteReader)
 
-	case "deflate":
+	case Deflate:
 		return flate.NewReader(byteReader), nil
 
 	default:
@@ -42,10 +42,10 @@ func getRawReader(byteReader *bytes.Buffer, encoding string) (io.Reader, error) 
 // Encode data in a []byte based on supplied encoding.
 func Encode(data []byte, encoding string) ([]byte, error) {
 	switch encoding {
-	case "gzip":
+	case Gzip:
 		return compressWithGzip(data)
 
-	case "deflate":
+	case Deflate:
 		return compressWithZlib(data)
 
 	default:

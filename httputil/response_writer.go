@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/packruler/rewrite-body/compressutil"
+	"github.com/packruler/plugin-themepark/compressutil"
 )
 
 // ResponseWrapper a wrapper used to simplify ResponseWriter data access and manipulation.
@@ -67,9 +67,7 @@ func (wrapper *ResponseWrapper) GetContent() ([]byte, error) {
 
 // SetContent write data to the internal ResponseWriter buffer
 // and match initial encoding.
-func (wrapper *ResponseWrapper) SetContent(data []byte) {
-	encoding := wrapper.getContentEncoding()
-
+func (wrapper *ResponseWrapper) SetContent(data []byte, encoding string) {
 	bodyBytes, _ := compressutil.Encode(data, encoding)
 
 	if !wrapper.wroteHeader {
@@ -127,11 +125,11 @@ func (wrapper *ResponseWrapper) SupportsProcessing() bool {
 
 	// If content type is supported validate encoding as well
 	switch encoding {
-	case "gzip":
+	case compressutil.Gzip:
 		fallthrough
-	case "deflate":
+	case compressutil.Deflate:
 		fallthrough
-	case "identity":
+	case compressutil.Identity:
 		fallthrough
 	case "":
 		return true

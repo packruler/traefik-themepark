@@ -9,15 +9,13 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/packruler/rewrite-body/apps"
-	"github.com/packruler/rewrite-body/httputil"
-	"github.com/packruler/rewrite-body/themes"
+	"github.com/packruler/plugin-themepark/httputil"
 )
 
 // Config holds the plugin configuration.
 type Config struct {
-	theme themes.ThemeName `json:"theme,omitempty" export: "true"`
-	app   apps.AppName     `json:"app,omitempty" export: "true"`
+	theme string `json:"theme,omitempty" export: "true"`
+	app   string `json:"app,omitempty" export: "true"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -28,8 +26,8 @@ func CreateConfig() *Config {
 type rewriteBody struct {
 	name  string
 	next  http.Handler
-	theme themes.ThemeName
-	app   apps.AppName
+	theme string
+	app   string
 }
 
 // New creates and returns a new rewrite body plugin instance.
@@ -56,10 +54,9 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 		ResponseWriter: response,
 	}
 
-	wrappedWriter.SetLastModified(bodyRewrite.lastModified)
+	wrappedRequest := httputil.WrapRequest(*req)
 
-	// look into using https://pkg.go.dev/net/http#RoundTripper
-	bodyRewrite.next.ServeHTTP(wrappedWriter, req)
+	bodyRewrite.next.ServeHTTP(wrappedWriter, wrappedRequest.CloneNoEncode())
 
 	if !wrappedWriter.SupportsProcessing() {
 		// We are ignoring these any errors because the content should be unchanged here.
@@ -85,11 +82,23 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 		return
 	}
 
-	for _, rwt := range bodyRewrite.rewrites {
-		bodyBytes = rwt.regex.ReplaceAll(bodyBytes, rwt.replacement)
-	}
+	bodyBytes = addThemeReference(bodyBytes, bodyRewrite.app, bodyRewrite.theme)
 
-	wrappedWriter.SetContent(bodyBytes)
+	encoding := wrappedRequest.GetEncodingTarget()
+
+	wrappedWriter.Header().Set("Content-Encoding", encoding)
+
+	wrappedWriter.SetContent(bodyBytes, encoding)
+}
+
+func addThemeReference(body []byte, appName string, themeName string) []byte {
+	replacementText := fmt.Sprintf("<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/%s/%s.css\"></head>", appName, themeName)
+
+	return getHeadCloseRegex().ReplaceAll(body, []byte(replacementText))
+}
+
+func getHeadCloseRegex() *regexp.Regexp {
+	return regexp.MustCompile("</head>")
 }
 
 func handlePanic() {

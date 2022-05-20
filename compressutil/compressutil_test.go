@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/packruler/rewrite-body/compressutil"
+	"github.com/packruler/plugin-themepark/compressutil"
 )
 
 type TestStruct struct {
@@ -33,21 +33,21 @@ func TestEncode(t *testing.T) {
 			desc:        "should support identity",
 			input:       normalBytes,
 			expected:    normalBytes,
-			encoding:    "identity",
+			encoding:    compressutil.Identity,
 			shouldMatch: true,
 		},
 		{
 			desc:        "should support gzip",
 			input:       normalBytes,
 			expected:    gzippedBytes,
-			encoding:    "gzip",
+			encoding:    compressutil.Gzip,
 			shouldMatch: false,
 		},
 		{
 			desc:        "should support deflate",
 			input:       normalBytes,
 			expected:    deflatedBytes,
-			encoding:    "deflate",
+			encoding:    compressutil.Deflate,
 			shouldMatch: false,
 		},
 		{
@@ -102,21 +102,21 @@ func TestDecode(t *testing.T) {
 			desc:        "should support identity",
 			input:       normalBytes,
 			expected:    normalBytes,
-			encoding:    "identity",
+			encoding:    compressutil.Identity,
 			shouldMatch: true,
 		},
 		{
 			desc:        "should support gzip",
 			input:       gzippedBytes,
 			expected:    normalBytes,
-			encoding:    "gzip",
+			encoding:    compressutil.Gzip,
 			shouldMatch: false,
 		},
 		{
 			desc:        "should support deflate",
 			input:       deflatedBytes,
 			expected:    normalBytes,
-			encoding:    "deflate",
+			encoding:    compressutil.Deflate,
 			shouldMatch: false,
 		},
 		{
