@@ -14,8 +14,8 @@ import (
 
 // Config holds the plugin configuration.
 type Config struct {
-	theme string `json:"theme,omitempty" export: "true"`
-	app   string `json:"app,omitempty" export: "true"`
+	Theme string `json:"theme,omitempty"`
+	App   string `json:"app,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -35,8 +35,8 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 	return &rewriteBody{
 		name:  name,
 		next:  next,
-		app:   config.app,
-		theme: config.theme,
+		app:   config.App,
+		theme: config.Theme,
 	}, nil
 }
 
@@ -91,8 +91,15 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 	wrappedWriter.SetContent(bodyBytes, encoding)
 }
 
+// lint:ignore line-length
+const replFormat string = "<link " +
+	"rel=\"stylesheet\" " +
+	"type=\"text/css\" " +
+	"href=\"https://theme-park.dev/css/base/%s/%s.css\">" +
+	"</head>"
+
 func addThemeReference(body []byte, appName string, themeName string) []byte {
-	replacementText := fmt.Sprintf("<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/%s/%s.css\"></head>", appName, themeName)
+	replacementText := fmt.Sprintf(replFormat, appName, themeName)
 
 	return getHeadCloseRegex().ReplaceAll(body, []byte(replacementText))
 }

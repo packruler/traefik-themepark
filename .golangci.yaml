@@ -1,6 +1,9 @@
 run:
   timeout: 3m
-  skip-files: []
+  skip-files:
+    - httputil/header/header.go
+    - apps/app_name.go
+    - themes/theme_name.go
   skip-dirs: []
 linters-settings:
   govet:
@@ -48,3 +51,6 @@ issues:
         - goconst
         - funlen
         - godot
+    - path: themepark.go:95
+      linters:
+        - line-length
