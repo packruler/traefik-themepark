@@ -3,9 +3,10 @@ package httputil
 import (
 	"net/http"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/packruler/plugin-themepark/compressutil"
-	"github.com/packruler/plugin-themepark/httputil/header"
 )
 
 // RequestWrapper a struct that centralizes request modifications.
@@ -32,8 +33,9 @@ func (req *RequestWrapper) CloneNoEncode() (clonedRequest *http.Request) {
 // GetEncodingTarget get the supported encoding algorithm preferred by request.
 func (req *RequestWrapper) GetEncodingTarget() string {
 	// Limit Accept-Encoding header to encodings we can handle.
-	acceptEncoding := header.ParseAccept(req.Header, "Accept-Encoding")
-	filteredEncodings := make([]header.AcceptSpec, 0, len(acceptEncoding))
+	// acceptEncoding := header.ParseAccept(req.Header, "Accept-Encoding")
+	acceptEncoding := parseAcceptEncoding(req.Header)
+	filteredEncodings := make([]encodingSpec, 0, len(acceptEncoding))
 
 	for _, a := range acceptEncoding {
 		switch a.Value {
@@ -47,8 +49,45 @@ func (req *RequestWrapper) GetEncodingTarget() string {
 	}
 
 	sort.Slice(filteredEncodings, func(i, j int) bool {
-		return filteredEncodings[i].Q > filteredEncodings[j].Q
+		return filteredEncodings[i].Quality > filteredEncodings[j].Quality
 	})
 
 	return filteredEncodings[0].Value
+}
+
+type encodingSpec struct {
+	Value   string
+	Quality float64
+}
+
+func parseAcceptEncoding(header http.Header) (result []encodingSpec) {
+	encodingList := strings.Split(header.Get("Accept-Encoding"), ",")
+	result = make([]encodingSpec, 0, len(encodingList))
+
+	for _, encoding := range encodingList {
+		result = append(result, parseEncodingItem(encoding))
+	}
+
+	return result
+}
+
+func parseEncodingItem(encoding string) encodingSpec {
+	encoding = strings.TrimSpace(encoding)
+	if encoding == "*" {
+		return encodingSpec{Value: compressutil.Gzip, Quality: 1.0}
+	}
+
+	split := strings.Split(encoding, ";q=")
+	quality := 1.0
+
+	if qualitySplitSize := 2; len(split) == qualitySplitSize {
+		targetFloat := 64
+
+		parsedQuality, err := strconv.ParseFloat(split[1], targetFloat)
+		if err == nil {
+			quality = parsedQuality
+		}
+	}
+
+	return encodingSpec{Value: split[0], Quality: quality}
 }
