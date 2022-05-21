@@ -14,8 +14,8 @@ import (
 
 // Config holds the plugin configuration.
 type Config struct {
-	Theme string `json:"theme,omitempty"`
-	App   string `json:"app,omitempty"`
+	Theme string `json:"theme,omitempty" xml:"theme,omitempty" toml:"theme,omitempty"`
+	App   string `json:"app,omitempty" xml:"app,omitempty" toml:"app,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -43,8 +43,9 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *http.Request) {
 	defer handlePanic()
 
+	wrappedRequest := httputil.WrapRequest(*req)
 	// allow default http.ResponseWriter to handle calls targeting WebSocket upgrades and non GET methods
-	if !httputil.SupportsProcessing(req) {
+	if !wrappedRequest.SupportsProcessing() {
 		bodyRewrite.next.ServeHTTP(response, req)
 
 		return
@@ -53,8 +54,6 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 	wrappedWriter := &httputil.ResponseWrapper{
 		ResponseWriter: response,
 	}
-
-	wrappedRequest := httputil.WrapRequest(*req)
 
 	bodyRewrite.next.ServeHTTP(wrappedWriter, wrappedRequest.CloneNoEncode())
 
