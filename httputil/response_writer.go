@@ -80,21 +80,6 @@ func (wrapper *ResponseWrapper) SetContent(data []byte, encoding string) {
 	}
 }
 
-// SupportsProcessing determine if http.Request is supported by this plugin.
-func SupportsProcessing(request *http.Request) bool {
-	// Ignore non GET requests
-	if request.Method != http.MethodGet {
-		return false
-	}
-
-	if strings.Contains(request.Header.Get("Upgrade"), "websocket") {
-		// log.Printf("Ignoring websocket request for %s", request.RequestURI)
-		return false
-	}
-
-	return true
-}
-
 func (wrapper *ResponseWrapper) getHeader(headerName string) string {
 	return wrapper.ResponseWriter.Header().Get(headerName)
 }
@@ -117,7 +102,7 @@ func (wrapper *ResponseWrapper) getContentType() string {
 // SupportsProcessing determine if HttpWrapper is supported by this plugin based on encoding.
 func (wrapper *ResponseWrapper) SupportsProcessing() bool {
 	// If content type does not match return values with false
-	if contentType := wrapper.getContentType(); contentType != "" && !strings.Contains(contentType, "text") {
+	if contentType := wrapper.getContentType(); contentType != "" && !strings.Contains(contentType, "text/html") {
 		return false
 	}
 
@@ -125,13 +110,7 @@ func (wrapper *ResponseWrapper) SupportsProcessing() bool {
 
 	// If content type is supported validate encoding as well
 	switch encoding {
-	case compressutil.Gzip:
-		fallthrough
-	case compressutil.Deflate:
-		fallthrough
-	case compressutil.Identity:
-		fallthrough
-	case "":
+	case compressutil.Gzip, compressutil.Deflate, compressutil.Identity, "":
 		return true
 	default:
 		return false

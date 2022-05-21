@@ -91,3 +91,18 @@ func parseEncodingItem(encoding string) encodingSpec {
 
 	return encodingSpec{Value: split[0], Quality: quality}
 }
+
+// SupportsProcessing determine if http.Request is supported by this plugin.
+func (req *RequestWrapper) SupportsProcessing() bool {
+	// Ignore non GET requests
+	if req.Method != http.MethodGet {
+		return false
+	}
+
+	if strings.Contains(req.Header.Get("Upgrade"), "websocket") {
+		// log.Printf("Ignoring websocket request for %s", request.RequestURI)
+		return false
+	}
+
+	return true
+}
