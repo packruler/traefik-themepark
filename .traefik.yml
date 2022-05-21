@@ -7,7 +7,5 @@ type: middleware
 import: github.com/packruler/plugin-themepark
 
 testData:
-  lastModified: true
-  rewrites:
-    - regex: "bar"
-      replacement: "foo"
+  app: sonarr
+  theme: dark
