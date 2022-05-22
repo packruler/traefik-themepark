@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -22,19 +21,21 @@ func compressString(value string, encoding string) string {
 func TestServeHTTP(t *testing.T) {
 	tests := []struct {
 		desc            string
+		acceptEncoding  string `default:"identity"`
+		acceptContent   string
 		contentEncoding string
 		contentType     string `default:"text/html"`
 		config          Config
-		acceptEncoding  string `default:"identity"`
 		resBody         string
 		expResBody      string
 		expLastModified bool
 	}{
 		{
-			desc:       "should replace </head> properly with no whitespace",
-			config:     Config{App: "sonarr", Theme: "dark"},
-			resBody:    "<head><script></script></head><body></body>",
-			expResBody: "<head><script></script>" + fmt.Sprintf(replFormat, "sonarr", "dark") + "<body></body>",
+			desc:          "should replace </head> properly with no whitespace",
+			config:        Config{App: "sonarr", Theme: "dark"},
+			resBody:       "<head><script></script></head><body></body>",
+			expResBody:    "<head><script></script>" + fmt.Sprintf(replFormat, "sonarr", "dark") + "<body></body>",
+			acceptContent: "text/html",
 		},
 		{
 			desc:   "should replace </head> properly with on new line",
@@ -47,6 +48,7 @@ func TestServeHTTP(t *testing.T) {
 			<script></script>
 			` + fmt.Sprintf(replFormat, "sonarr", "dark") + `
 			<body></body>`,
+			acceptContent: "text/html",
 		},
 		{
 			desc:    "should compress to gzip with proper header",
@@ -57,6 +59,7 @@ func TestServeHTTP(t *testing.T) {
 				compressutil.Gzip,
 			),
 			acceptEncoding: compressutil.Gzip,
+			acceptContent:  "text/html",
 		},
 		{
 			desc:    "should compress to zlib with proper header",
@@ -67,6 +70,7 @@ func TestServeHTTP(t *testing.T) {
 				compressutil.Deflate,
 			),
 			acceptEncoding: compressutil.Deflate,
+			acceptContent:  "text/html",
 		},
 	}
 
@@ -91,11 +95,12 @@ func TestServeHTTP(t *testing.T) {
 			recorder := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			req.Header.Set("Accept-Encoding", test.acceptEncoding)
+			req.Header.Set("Accept", test.acceptContent)
 			recorder.Result().Header.Set("Content-Type", "text/html")
 
 			rewriteBody.ServeHTTP(recorder, req)
 
-			log.Printf("Header: %v", recorder.Header())
+			// log.Printf("Header: %v", recorder.Header())
 			// if _, exists := recorder.Result().Header["Last-Modified"]; exists != test.expLastModified {
 			// 	t.Errorf("got last-modified header %v, want %v", exists, test.expLastModified)
 			// }

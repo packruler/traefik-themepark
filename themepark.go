@@ -47,6 +47,7 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 	// allow default http.ResponseWriter to handle calls targeting WebSocket upgrades and non GET methods
 	if !wrappedRequest.SupportsProcessing() {
 		bodyRewrite.next.ServeHTTP(response, req)
+		log.Printf("Ignore: %v", req)
 
 		return
 	}

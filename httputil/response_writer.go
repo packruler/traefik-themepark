@@ -16,7 +16,7 @@ import (
 // ResponseWrapper a wrapper used to simplify ResponseWriter data access and manipulation.
 type ResponseWrapper struct {
 	buffer       bytes.Buffer
-	lastModified bool
+	lastModified bool `default:"true"`
 	wroteHeader  bool
 
 	code int `default:"200"`

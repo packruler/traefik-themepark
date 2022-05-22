@@ -30,6 +30,15 @@ func (req *RequestWrapper) CloneNoEncode() (clonedRequest *http.Request) {
 	return clonedRequest
 }
 
+// CloneWithSupportedEncoding create an http.Request that request only supported encoding.
+func (req *RequestWrapper) CloneWithSupportedEncoding() (clonedRequest *http.Request) {
+	clonedRequest = req.Clone(req.Context())
+
+	clonedRequest.Header.Set("Accept-Encoding", removeUnsupportedAcceptEncoding(clonedRequest.Header))
+
+	return clonedRequest
+}
+
 // GetEncodingTarget get the supported encoding algorithm preferred by request.
 func (req *RequestWrapper) GetEncodingTarget() string {
 	// Limit Accept-Encoding header to encodings we can handle.
@@ -92,8 +101,27 @@ func parseEncodingItem(encoding string) encodingSpec {
 	return encodingSpec{Value: split[0], Quality: quality}
 }
 
+func removeUnsupportedAcceptEncoding(header http.Header) string {
+	encodingList := strings.Split(header.Get("Accept-Encoding"), ",")
+	result := make([]string, 0, len(encodingList))
+
+	for _, encoding := range encodingList {
+		split := strings.Split(strings.TrimSpace(encoding), ";q=")
+		switch split[0] {
+		case compressutil.Gzip, compressutil.Deflate, compressutil.Identity:
+			result = append(result, encoding)
+		}
+	}
+
+	return strings.Join(result, ",")
+}
+
 // SupportsProcessing determine if http.Request is supported by this plugin.
 func (req *RequestWrapper) SupportsProcessing() bool {
+	if !strings.Contains(req.Header.Get("Accept"), "text/html") {
+		return false
+	}
+
 	// Ignore non GET requests
 	if req.Method != http.MethodGet {
 		return false
