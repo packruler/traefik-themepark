@@ -1,4 +1,4 @@
-# `theme.park` Plugin
+# `theme.park` Traefik Plugin
 
 ***This plugin is currently in beta***
 
