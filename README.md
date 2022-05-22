@@ -11,13 +11,13 @@ All credit for design and styling to the various contributors to
 
 Here is a list of features: (current [x], planned [ ], and potential `?`)
 
-[x] Support for all supported themes and apps in [theme.park](https://theme-park.dev)
-[x] Supports service side compression:
-  [x] `gzip` - gzip
-  [x] `deflate` - zlib
-   ?  `br` - brotli (currently unsupported in [Yaegi](https://github.com/traefik/yaegi) for Traefik plugins)
-[x] Limits the HTTP queries which are touched by plugin to improve performance
-[x] Updates requests to limit requests' `Accept-Encoding` to include only supported systems
+* [x] Support for all supported themes and apps in [theme.park](https://theme-park.dev)
+* [x] Supports service side compression:
+  - [x] `gzip` - gzip
+  - [x] `deflate` - zlib
+  -  ?  `br` - brotli (currently unsupported in [Yaegi](https://github.com/traefik/yaegi) for Traefik plugins)
+* [x] Limits the HTTP queries which are touched by plugin to improve performance
+* [x] Updates requests to limit requests' `Accept-Encoding` to include only supported systems
 
 ## Configuration
 
