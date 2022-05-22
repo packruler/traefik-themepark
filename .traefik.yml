@@ -10,5 +10,5 @@ testData:
   app: sonarr
   theme: dark
 
-iconPath: https://docs.theme-park.dev/site_assets/logo.png
-bannerPath: https://github.com/GilbN/theme.park/blob/master/banners/tp_banner.png
+iconPath: assets/logo.png
+bannerPath: assets/tp_banner.png
