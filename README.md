@@ -1,35 +1,20 @@
-# Rewrite Body
+# `theme.park` Plugin
 
-This is a fork of [Traefik](https://github.com/traefik)'s [plugin-rewritebody](https://github.com/traefik/plugin-rewritebody)
-that is aimed at extending support to handle `gzip` content. This was initially aimed at extending the support for utilizing
-[theme.park](https://github.com/traefik/plugin-rewritebody)'s themes but can likely be used for a range of other uses.
+***This plugin is currently in beta***
 
-## Changes From Original Traefik Plugin
+Apply themes from [theme.park](https://theme-park.dev) to supported applications.
 
-The primary change is to add support for `gzip` content. This brought another potential issue to mind, what about really large
-content? This was handled as well.
+## Features
 
-### Process For Handling Body Content
+Here is a list of features: (current [x], planned [ ], and potential `?`)
 
-#### Body Content Requirements
-
-* The header must have `Content-Type` that includes `text`. For example:
-  * `text/html`
-  * `text/json`
-* The header must have `Content-Encoding` header that is supported by this plugin
-  * The original plugin supported `Content-Encoding` of `identity` or empty
-  * This plugin adds support for `gzip` and `zlib` encoding
-
-#### Processing Paths
-
-* If the either of the previous conditions failes the body is passed on as is and no further processing from this plugin occurs.
-
-* If the `Content-Encoding` is empty or `identity` it is handled in mostly the same manner as the original plugin.
-
-* If the `Content-Encoding` is `gzip` the following process happens:
-  * The body content is decompressed by [Go-lang's gzip library](https://pkg.go.dev/compress/gzip)
-  * The resulting content is run through the `regex` process created by the original plugin
-  * The processed content is then compressed with the same library and returned
+[x] Support for all supported themes and apps in [theme.park](https://theme-park.dev)
+[x] Supports service side compression:
+  [x] `gzip` - gzip
+  [x] `deflate` - zlib
+   ?  `br` - brotli (currently unsupported in [Yaegi](https://github.com/traefik/yaegi) for Traefik plugins)
+[x] Limits the HTTP queries which are touched by plugin to improve performance
+[x] Updates requests to limit requests' `Accept-Encoding` to include only supported systems
 
 ## Configuration
 
@@ -41,18 +26,23 @@ pilot:
 
 experimental:
     plugins:
-        rewrite-body:
-            moduleName: "github.com/packruler/rewrite-body"
-            version: "v0.5.0"
+        themepark:
+            moduleName: "github.com/packruler/plugin-themepark"
+            version: "v0.1.0"
 ```
 
 ### Dynamic
 
-To configure the `Rewrite Body` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in 
+To configure the `theme.park` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in 
 your dynamic configuration as explained [here](https://docs.traefik.io/middlewares/overview/). The following example creates
-and uses the `rewritebody` middleware plugin to replace all foo occurences by bar in the HTTP response body.
+and uses the `themepark` middleware plugin to replace all foo occurences by bar in the HTTP response body.
 
-If you want to apply some limits on the response body, you can chain this middleware plugin with the [Buffering middleware](https://docs.traefik.io/middlewares/buffering/) from Traefik.
+The `app` and `theme` values passed to the plugin should match the `<style>` tag provided in the `Installation` section.
+The example below would match `Installation` section having the following `<style>` tag.
+
+`<link rel="stylesheet" type="text/css" href="https://theme-park.dev/css/base/sonarr/dark.css">`
+
+
 
 ```yaml
 http:
@@ -60,21 +50,18 @@ http:
     my-router:
       rule: "Host(`localhost`)"
       middlewares: 
-        - "rewrite-foo"
+        - "sonarr-dark"
       service: "my-service"
 
   middlewares:
-    rewrite-foo:
+    sonarr-dark:
       plugin:
-        rewrite-body:
-          # Keep Last-Modified header returned by the HTTP service.
-          # By default, the Last-Modified header is removed.
-          lastModified: true
+        themepark:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: sonarr
 
-          # Rewrites all "foo" occurences by "bar"
-          rewrites:
-            - regex: "foo"
-              replacement: "bar"
+          # The name of the supported theme listed on https://docs.theme-park.dev/theme-options/ or https://docs.theme-park.dev/community-themes/
+          theme: dark
   services:
     my-service:
       loadBalancer:
@@ -82,32 +69,32 @@ http:
           - url: "http://127.0.0.1"
 ```
 
-## Example theme.park
+## How Does This Work?
 
-### Dynamic
+This is an extension of the [rewrite-body](https://github.com/packruler/rewrite-body)
+plugin I created based on Traefik's [plugin-rewritebody](https://github.com/traefik/plugin-rewritebody)
+to add support for compressed content.
 
-```yaml
-http:
-  routers:
-    sonarr-router:
-      rule: "Host(`sonarr.example.com`)"
-      middlewares: 
-        - sonarr-theme
-      service: sonarr-service
+That said, this plugin is more focused on `theme.park` support and allows more targetted
+middleware logic. This means the overhead added by the plugin's logic is very limited.
+You can read more about that in the [process](#process) section.
 
-  middlewares:
-    sonarr-theme:
-      plugin:
-        rewrite-body:
-          rewrites:
-            - regex: </head>
-              replacement: <link rel="stylesheet" type="text/css" href="https://theme-park.dev/css/base/sonarr/{{ env "THEME" }}.css"></head>
+### Process
 
-  services:
-    sonarr-service:
-      servers:
-        - url: http://localhost:8989
-```
+#### Supported Requests
 
-You can set an environment variable `THEME` to the name of a theme for easier consistency across apps.
+For any updates to be attempted the following conditions must be met by the incoming request:
 
+- `Accept` header must include `text/html`
+- HTTP `Method` must be `GET`
+
+These conditions are intended to drastically limit the HTTP queries that are touched by this plugin.
+At this time these conditions properly cover all tested applications.
+
+#### Supported Responses
+
+Assuming [Supported Request](#supported-requests) conditions have been met, the following conditions must
+be met by the resulting response:
+
+- `Content-Type` must be `text/html`
+- `Content-Encoding` must be a support compression (`gzip`, `deflate`, or `identity`)
