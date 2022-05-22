@@ -1,4 +1,4 @@
-package theme_park
+package plugin_themepark
 
 import (
 	"bytes"

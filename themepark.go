@@ -1,5 +1,5 @@
-// Package theme_park a plugin to rewrite response body.
-package theme_park
+// Package plugin_themepark a plugin to rewrite response body.
+package plugin_themepark
 
 import (
 	"context"
