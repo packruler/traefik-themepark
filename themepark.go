@@ -55,7 +55,7 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 		ResponseWriter: response,
 	}
 
-	bodyRewrite.next.ServeHTTP(wrappedWriter, wrappedRequest.CloneNoEncode())
+	bodyRewrite.next.ServeHTTP(wrappedWriter, req)
 
 	if !wrappedWriter.SupportsProcessing() {
 		// We are ignoring these any errors because the content should be unchanged here.
@@ -84,8 +84,6 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 	bodyBytes = addThemeReference(bodyBytes, bodyRewrite.app, bodyRewrite.theme)
 
 	encoding := wrappedRequest.GetEncodingTarget()
-
-	wrappedWriter.Header().Set("Content-Encoding", encoding)
 
 	wrappedWriter.SetContent(bodyBytes, encoding)
 }
