@@ -4,6 +4,9 @@
 
 Apply themes from [theme.park](https://theme-park.dev) to supported applications.
 
+All credit for design and styling to the various contributors to
+[https://github.com/GilbN/theme.park](https://github.com/GilbN/theme.park)!
+
 ## Features
 
 Here is a list of features: (current [x], planned [ ], and potential `?`)
