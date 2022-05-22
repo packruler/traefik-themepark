@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/packruler/plugin-themepark/compressutil"
+	"github.com/packruler/traefik-themepark/compressutil"
 )
 
 // ResponseWrapper a wrapper used to simplify ResponseWriter data access and manipulation.

@@ -1,10 +1,10 @@
-displayName: theme.park Plugin
+displayName: theme.park
 
 summary: Apply themes from [theme.park](theme-park.dev) to supported applications.
 
 type: middleware
 
-import: github.com/packruler/plugin-themepark
+import: github.com/packruler/traefik-themepark
 
 testData:
   app: sonarr

@@ -27,8 +27,8 @@ pilot:
 experimental:
     plugins:
         themepark:
-            moduleName: "github.com/packruler/plugin-themepark"
-            version: "v0.1.0"
+            moduleName: "github.com/packruler/traefik-themepark"
+            version: "v0.1.1"
 ```
 
 ### Dynamic

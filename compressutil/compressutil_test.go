@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/packruler/plugin-themepark/compressutil"
+	"github.com/packruler/traefik-themepark/compressutil"
 )
 
 type TestStruct struct {

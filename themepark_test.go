@@ -1,4 +1,4 @@
-package plugin_themepark
+package traefik_themepark
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/packruler/plugin-themepark/compressutil"
+	"github.com/packruler/traefik-themepark/compressutil"
 )
 
 func compressString(value string, encoding string) string {

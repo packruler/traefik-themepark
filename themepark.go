@@ -1,5 +1,5 @@
-// Package plugin_themepark a plugin to rewrite response body.
-package plugin_themepark
+// Package traefik_themepark a plugin to rewrite response body.
+package traefik_themepark
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/packruler/plugin-themepark/httputil"
+	"github.com/packruler/traefik-themepark/httputil"
 )
 
 // Config holds the plugin configuration.

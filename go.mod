@@ -1,3 +1,3 @@
-module github.com/packruler/plugin-themepark
+module github.com/packruler/traefik-themepark
 
 go 1.16
