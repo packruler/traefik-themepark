@@ -1,4 +1,4 @@
-# `theme.park` Traefik Plugin
+# theme.park Traefik Plugin
 
 ***This plugin is currently in beta***
 
@@ -31,7 +31,7 @@ experimental:
     plugins:
         themepark:
             moduleName: "github.com/packruler/traefik-themepark"
-            version: "v0.1.1"
+            version: "v0.2.1"
 ```
 
 ### Dynamic
