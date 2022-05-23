@@ -86,6 +86,7 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 	encoding := wrappedWriter.Header().Get("Content-Encoding")
 
 	wrappedWriter.SetContent(bodyBytes, encoding)
+	wrappedWriter.LogHeaders()
 }
 
 // lint:ignore line-length

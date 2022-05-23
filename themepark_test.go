@@ -20,15 +20,17 @@ func compressString(value string, encoding string) string {
 
 func TestServeHTTP(t *testing.T) {
 	tests := []struct {
-		desc            string
-		acceptEncoding  string `default:"identity"`
-		acceptContent   string
-		contentEncoding string
-		contentType     string `default:"text/html"`
-		config          Config
-		resBody         string
-		expResBody      string
-		expLastModified bool
+		desc                     string
+		acceptEncoding           string `default:"identity"`
+		acceptContent            string
+		config                   Config
+		contentEncoding          string
+		contentSecurityPolicy    string
+		contentType              string `default:"text/html"`
+		expContentSecurityPolicy string
+		expResBody               string
+		expLastModified          bool
+		resBody                  string
 	}{
 		{
 			desc:          "should replace </head> properly with no whitespace",
@@ -79,6 +81,30 @@ func TestServeHTTP(t *testing.T) {
 			expResBody:     "<head><script></script>" + fmt.Sprintf(replFormat, "sonarr", "dark") + "<body></body>",
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
+		},
+		{
+			desc:    "should modify content-security-policy headers",
+			config:  Config{App: "sonarr", Theme: "dark"},
+			resBody: "<head><script></script></head><body></body>",
+			expResBody: "<head><script></script>" +
+				fmt.Sprintf(replFormat, "sonarr", "dark") +
+				"<body></body>",
+			acceptEncoding: compressutil.Gzip,
+			acceptContent:  "text/html",
+			contentSecurityPolicy: "default-src 'self'; " +
+				"style-src 'self' 'unsafe-inline'; " +
+				"img-src 'self' data:; " +
+				"script-src 'self' 'unsafe-inline'; " +
+				"object-src 'none'; " +
+				"form-action 'self';",
+			expContentSecurityPolicy: "content-security-policy: default-src 'self'; " +
+				"style-src 'self' 'unsafe-inline' theme-park.dev raw.githubusercontent.com use.fontawesome.com; " +
+				"img-src 'self' theme-park.dev raw.githubusercontent.com data:; " +
+				"script-src 'self' 'unsafe-inline'; " +
+				"object-src 'none'; " +
+				"form-action 'self'; " +
+				"frame-ancestors 'self'; " +
+				"font-src use.fontawesome.com;",
 		},
 	}
 
