@@ -83,7 +83,7 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 
 	bodyBytes = addThemeReference(bodyBytes, bodyRewrite.app, bodyRewrite.theme)
 
-	encoding := wrappedRequest.GetEncodingTarget()
+	encoding := wrappedWriter.Header().Get("Content-Encoding")
 
 	wrappedWriter.SetContent(bodyBytes, encoding)
 }
