@@ -21,20 +21,23 @@ func compressString(value string, encoding string) string {
 func TestServeHTTP(t *testing.T) {
 	tests := []struct {
 		desc            string
-		acceptEncoding  string `default:"identity"`
+		acceptEncoding  string
 		acceptContent   string
 		contentEncoding string
-		contentType     string `default:"text/html"`
+		contentType     string
 		config          Config
 		resBody         string
 		expResBody      string
 		expLastModified bool
+		baseURL         string
 	}{
 		{
-			desc:          "should replace </head> properly with no whitespace",
-			config:        Config{App: "sonarr", Theme: "dark"},
-			resBody:       "<head><script></script></head><body></body>",
-			expResBody:    "<head><script></script>" + fmt.Sprintf(replFormat, "sonarr", "dark") + "<body></body>",
+			desc:    "should replace </head> properly with no whitespace",
+			config:  Config{App: "sonarr", Theme: "dark"},
+			resBody: "<head><script></script></head><body></body>",
+			expResBody: "<head><script></script>" +
+				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				"<body></body>",
 			acceptContent: "text/html",
 		},
 		{
@@ -46,7 +49,7 @@ func TestServeHTTP(t *testing.T) {
 			<body></body>`,
 			expResBody: `<head>
 			<script></script>
-			` + fmt.Sprintf(replFormat, "sonarr", "dark") + `
+			` + fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") + `
 			<body></body>`,
 			acceptContent: "text/html",
 		},
@@ -55,7 +58,10 @@ func TestServeHTTP(t *testing.T) {
 			config:          Config{App: "sonarr", Theme: "dark"},
 			contentEncoding: compressutil.Gzip,
 			resBody:         compressString("<head><script></script></head><body></body>", compressutil.Gzip),
-			expResBody: compressString("<head><script></script>"+fmt.Sprintf(replFormat, "sonarr", "dark")+"<body></body>",
+			expResBody: compressString(
+				"<head><script></script>"+
+					fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+
+					"<body></body>",
 				compressutil.Gzip),
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
@@ -66,17 +72,29 @@ func TestServeHTTP(t *testing.T) {
 			contentEncoding: compressutil.Deflate,
 			resBody:         compressString("<head><script></script></head><body></body>", compressutil.Deflate),
 			expResBody: compressString(
-				"<head><script></script>"+fmt.Sprintf(replFormat, "sonarr", "dark")+"<body></body>",
+				"<head><script></script>"+fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+"<body></body>",
 				compressutil.Deflate,
 			),
 			acceptEncoding: compressutil.Deflate,
 			acceptContent:  "text/html",
 		},
 		{
-			desc:           "should not compress if not encoded from service",
-			config:         Config{App: "sonarr", Theme: "dark"},
-			resBody:        "<head><script></script></head><body></body>",
-			expResBody:     "<head><script></script>" + fmt.Sprintf(replFormat, "sonarr", "dark") + "<body></body>",
+			desc:    "should not compress if not encoded from service",
+			config:  Config{App: "sonarr", Theme: "dark"},
+			resBody: "<head><script></script></head><body></body>",
+			expResBody: "<head><script></script>" +
+				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				"<body></body>",
+			acceptEncoding: compressutil.Gzip,
+			acceptContent:  "text/html",
+		},
+		{
+			desc:    "should use custom baseURL",
+			config:  Config{App: "sonarr", Theme: "dark", BaseURL: "http://test.com"},
+			resBody: "<head><script></script></head><body></body>",
+			expResBody: "<head><script></script>" +
+				fmt.Sprintf(replFormat, "http://test.com", "sonarr", "dark") +
+				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
 		},

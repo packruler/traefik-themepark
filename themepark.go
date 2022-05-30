@@ -14,8 +14,9 @@ import (
 
 // Config holds the plugin configuration.
 type Config struct {
-	Theme string `json:"theme,omitempty" xml:"theme,omitempty" toml:"theme,omitempty"`
-	App   string `json:"app,omitempty" xml:"app,omitempty" toml:"app,omitempty"`
+	Theme   string `json:"theme,omitempty"`
+	App     string `json:"app,omitempty"`
+	BaseURL string `json:"baseUrl,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -24,19 +25,25 @@ func CreateConfig() *Config {
 }
 
 type rewriteBody struct {
-	name  string
-	next  http.Handler
-	theme string
-	app   string
+	name    string
+	next    http.Handler
+	theme   string
+	app     string
+	baseURL string
 }
 
 // New creates and returns a new rewrite body plugin instance.
 func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
+	if config.BaseURL == "" {
+		config.BaseURL = "https://theme-park.dev"
+	}
+
 	return &rewriteBody{
-		name:  name,
-		next:  next,
-		app:   config.App,
-		theme: config.Theme,
+		name:    name,
+		next:    next,
+		app:     config.App,
+		theme:   config.Theme,
+		baseURL: config.BaseURL,
 	}, nil
 }
 
@@ -81,7 +88,7 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 		return
 	}
 
-	bodyBytes = addThemeReference(bodyBytes, bodyRewrite.app, bodyRewrite.theme)
+	bodyBytes = addThemeReference(bodyBytes, bodyRewrite.baseURL, bodyRewrite.app, bodyRewrite.theme)
 
 	encoding := wrappedWriter.Header().Get("Content-Encoding")
 
@@ -92,11 +99,11 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 const replFormat string = "<link " +
 	"rel=\"stylesheet\" " +
 	"type=\"text/css\" " +
-	"href=\"https://theme-park.dev/css/base/%s/%s.css\">" +
+	"href=\"%s/css/base/%s/%s.css\">" +
 	"</head>"
 
-func addThemeReference(body []byte, appName string, themeName string) []byte {
-	replacementText := fmt.Sprintf(replFormat, appName, themeName)
+func addThemeReference(body []byte, baseURL string, appName string, themeName string) []byte {
+	replacementText := fmt.Sprintf(replFormat, baseURL, appName, themeName)
 
 	return getHeadCloseRegex().ReplaceAll(body, []byte(replacementText))
 }
