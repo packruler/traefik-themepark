@@ -1,7 +1,5 @@
 # theme.park Traefik Plugin
 
-***This plugin is currently in beta***
-
 Apply themes from [theme.park](https://theme-park.dev) to supported applications.
 
 All credit for design and styling to the various contributors to
