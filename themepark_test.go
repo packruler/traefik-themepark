@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/packruler/compressutil"
+	"github.com/packruler/plugin-utils/compressutil"
 )
 
 func compressString(value string, encoding string) string {

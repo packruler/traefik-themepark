@@ -9,14 +9,16 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/packruler/httputil"
+	"github.com/packruler/plugin-utils/httputil"
+	"github.com/packruler/plugin-utils/logger"
 )
 
 // Config holds the plugin configuration.
 type Config struct {
-	Theme   string `json:"theme,omitempty"`
-	App     string `json:"app,omitempty"`
-	BaseURL string `json:"baseUrl,omitempty"`
+	Theme    string `json:"theme,omitempty"`
+	App      string `json:"app,omitempty"`
+	BaseURL  string `json:"baseUrl,omitempty"`
+	LogLevel int8   `json:"logLevel,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -30,6 +32,7 @@ type rewriteBody struct {
 	theme   string
 	app     string
 	baseURL string
+	logger  logger.LogWriter
 }
 
 // New creates and returns a new rewrite body plugin instance.
@@ -38,12 +41,25 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 		config.BaseURL = "https://theme-park.dev"
 	}
 
+	switch config.LogLevel {
+	// Convert default 0 to Info level
+	case 0:
+		config.LogLevel = int8(logger.Info)
+	// Allow -1 to be call for Trace level
+	case -1:
+		config.LogLevel = int8(logger.Trace)
+	default:
+	}
+
+	logWriter := *logger.CreateLogger(logger.LogLevel(config.LogLevel))
+
 	return &rewriteBody{
 		name:    name,
 		next:    next,
 		app:     config.App,
 		theme:   config.Theme,
 		baseURL: config.BaseURL,
+		logger:  logWriter,
 	}, nil
 }
 

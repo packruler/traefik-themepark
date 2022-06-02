@@ -1,8 +1,7 @@
 module github.com/packruler/traefik-themepark
 
 require (
-	github.com/packruler/compressutil v0.0.1
-	github.com/packruler/httputil v0.0.1
+	github.com/packruler/plugin-utils v0.0.2
 )
 
 go 1.16

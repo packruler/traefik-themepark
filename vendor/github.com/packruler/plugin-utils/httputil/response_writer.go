@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/packruler/compressutil"
+	"github.com/packruler/plugin-utils/compressutil"
 )
 
 // ResponseWrapper a wrapper used to simplify ResponseWriter data access and manipulation.
