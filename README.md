@@ -1,4 +1,4 @@
-# theme.park Traefik Plugin
+# `theme.park` Traefik Plugin
 
 Apply themes from [theme.park](https://theme-park.dev) to supported applications.
 
