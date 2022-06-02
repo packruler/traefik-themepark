@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/packruler/traefik-themepark/compressutil"
+	"github.com/packruler/compressutil"
 )
 
 // RequestWrapper a struct that centralizes request modifications.

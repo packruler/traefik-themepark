@@ -1,0 +1,6 @@
+# github.com/packruler/compressutil v0.0.1
+## explicit
+github.com/packruler/compressutil
+# github.com/packruler/httputil v0.0.1
+## explicit
+github.com/packruler/httputil

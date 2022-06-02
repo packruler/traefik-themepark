@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/packruler/traefik-themepark/httputil"
+	"github.com/packruler/httputil"
 )
 
 // Config holds the plugin configuration.

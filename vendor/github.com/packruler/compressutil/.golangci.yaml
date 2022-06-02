@@ -1,0 +1,56 @@
+run:
+  timeout: 3m
+  skip-files:
+    - httputil/header/header.go
+    - apps/app_name.go
+    - themes/theme_name.go
+  skip-dirs: []
+linters-settings:
+  govet:
+    check-shadowing: false
+  golint:
+    min-confidence: 0
+  gocyclo:
+    min-complexity: 12
+  maligned:
+    suggest-new: true
+  goconst:
+    min-len: 3
+    min-occurrences: 4
+  misspell:
+    locale: US
+  funlen:
+    lines: 60
+    statements: 40
+linters:
+  enable-all: true
+  disable:
+    - scopelint
+    - golint
+    - interfacer
+    - maligned
+    - bodyclose
+    - goerr113
+    - wrapcheck
+    - maligned
+    - exhaustivestruct
+    - testpackage
+    - paralleltest
+    - tparallel
+issues:
+  exclude-use-default: false
+  max-per-linter: 0
+  max-same-issues: 0
+  exclude:
+    - don't use an underscore in package name
+    - "ST1003: should not use underscores in package names"
+    - "SA1019: http.CloseNotifier has been deprecated since Go 1.11 and an alternative has been available since Go 1.7: the CloseNotifier interface predates Go's context package. New code should use Request.Context instead."
+  exclude-rules:
+    - path: (.+)_test.go
+      linters:
+        - goconst
+        - funlen
+        - godot
+    - path: themepark.go:95
+      linters:
+        - line-length
