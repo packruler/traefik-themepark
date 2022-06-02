@@ -36,7 +36,7 @@ experimental:
 
 ### Dynamic
 
-To configure the `theme.park` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in 
+To configure the `theme.park` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in
 your dynamic configuration as explained [here](https://docs.traefik.io/middlewares/overview/). The following example creates
 and uses the `themepark` middleware plugin to replace all foo occurences by bar in the HTTP response body.
 
@@ -52,7 +52,7 @@ http:
   routers:
     my-router:
       rule: "Host(`localhost`)"
-      middlewares: 
+      middlewares:
         - "sonarr-dark"
       service: "my-service"
 
