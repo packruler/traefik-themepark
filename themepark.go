@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
 
@@ -13,12 +12,18 @@ import (
 	"github.com/packruler/plugin-utils/logger"
 )
 
+type monitoringConfig struct {
+	types   string
+	methods string
+}
+
 // Config holds the plugin configuration.
 type Config struct {
-	Theme    string `json:"theme,omitempty"`
-	App      string `json:"app,omitempty"`
-	BaseURL  string `json:"baseUrl,omitempty"`
-	LogLevel int8   `json:"logLevel,omitempty"`
+	Theme      string           `json:"theme,omitempty"`
+	App        string           `json:"app,omitempty"`
+	BaseURL    string           `json:"baseUrl,omitempty"`
+	LogLevel   int8             `json:"logLevel,omitempty"`
+	Monitoring monitoringConfig `json:"monitor,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -27,12 +32,13 @@ func CreateConfig() *Config {
 }
 
 type rewriteBody struct {
-	name    string
-	next    http.Handler
-	theme   string
-	app     string
-	baseURL string
-	logger  logger.LogWriter
+	name       string
+	next       http.Handler
+	theme      string
+	app        string
+	baseURL    string
+	logger     logger.LogWriter
+	monitoring httputil.MonitoringConfig
 }
 
 // New creates and returns a new rewrite body plugin instance.
@@ -51,22 +57,25 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 	default:
 	}
 
-	logWriter := *logger.CreateLogger(logger.LogLevel(config.LogLevel))
+	logWriter := logger.CreateLogger(logger.LogLevel(config.LogLevel))
+
+	monitoring := httputil.ParseMonitoringConfig(config.Monitoring.types, config.Monitoring.methods)
 
 	return &rewriteBody{
-		name:    name,
-		next:    next,
-		app:     config.App,
-		theme:   config.Theme,
-		baseURL: config.BaseURL,
-		logger:  logWriter,
+		name:       name,
+		next:       next,
+		app:        config.App,
+		theme:      config.Theme,
+		baseURL:    config.BaseURL,
+		logger:     *logWriter,
+		monitoring: monitoring,
 	}, nil
 }
 
 func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *http.Request) {
-	defer handlePanic()
+	defer bodyRewrite.handlePanic()
 
-	wrappedRequest := httputil.WrapRequest(*req)
+	wrappedRequest := httputil.WrapRequest(*req, bodyRewrite.monitoring, bodyRewrite.logger)
 	// allow default http.ResponseWriter to handle calls targeting WebSocket upgrades and non GET methods
 	if !wrappedRequest.SupportsProcessing() {
 		bodyRewrite.next.ServeHTTP(response, req)
@@ -90,10 +99,10 @@ func (bodyRewrite *rewriteBody) ServeHTTP(response http.ResponseWriter, req *htt
 
 	bodyBytes, err := wrappedWriter.GetContent()
 	if err != nil {
-		log.Printf("Error loading content: %v", err)
+		bodyRewrite.logger.LogErrorf("Error loading content: %v", err)
 
 		if _, err := response.Write(wrappedWriter.GetBuffer().Bytes()); err != nil {
-			log.Printf("unable to write error content: %v", err)
+			bodyRewrite.logger.LogErrorf("unable to write error content: %v", err)
 		}
 
 		return
@@ -128,21 +137,21 @@ func getHeadCloseRegex() *regexp.Regexp {
 	return regexp.MustCompile("</head>")
 }
 
-func handlePanic() {
+func (bodyRewrite *rewriteBody) handlePanic() {
 	if recovery := recover(); recovery != nil {
 		if err, ok := recovery.(error); ok {
-			logError(err)
+			bodyRewrite.logError(err)
 		} else {
-			log.Printf("Unhandled error: %v", recovery)
+			bodyRewrite.logger.LogWarningf("Unhandled error: %v", recovery)
 		}
 	}
 }
 
-func logError(err error) {
+func (bodyRewrite *rewriteBody) logError(err error) {
 	// Ignore http.ErrAbortHandler because they are expected errors that do not require handling
 	if errors.Is(err, http.ErrAbortHandler) {
 		return
 	}
 
-	log.Printf("Recovered from: %v", err)
+	bodyRewrite.logger.LogWarningf("Recovered from: %v", err)
 }

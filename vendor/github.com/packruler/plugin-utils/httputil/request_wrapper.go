@@ -7,17 +7,23 @@ import (
 	"strings"
 
 	"github.com/packruler/plugin-utils/compressutil"
+	"github.com/packruler/plugin-utils/logger"
 )
 
 // RequestWrapper a struct that centralizes request modifications.
 type RequestWrapper struct {
+	logWriter  logger.LogWriter
+	monitoring MonitoringConfig
+
 	http.Request
 }
 
 // WrapRequest to get a new instance of RequestWrapper.
-func WrapRequest(request http.Request) RequestWrapper {
+func WrapRequest(request http.Request, monitoringConfig MonitoringConfig, logWriter logger.LogWriter) RequestWrapper {
 	return RequestWrapper{
-		request,
+		logWriter:  logWriter,
+		monitoring: monitoringConfig,
+		Request:    request,
 	}
 }
 
@@ -70,7 +76,12 @@ type encodingSpec struct {
 }
 
 func parseAcceptEncoding(header http.Header) (result []encodingSpec) {
-	encodingList := strings.Split(header.Get("Accept-Encoding"), ",")
+	encodingHeader := header.Get("Accept-Encoding")
+	if encodingHeader == "*" {
+		return []encodingSpec{{Quality: 1.0, Value: compressutil.Gzip}, {Quality: 1.0, Value: compressutil.Deflate}}
+	}
+
+	encodingList := strings.Split(encodingHeader, ",")
 	result = make([]encodingSpec, 0, len(encodingList))
 
 	for _, encoding := range encodingList {
@@ -118,8 +129,11 @@ func removeUnsupportedAcceptEncoding(header http.Header) string {
 
 // SupportsProcessing determine if http.Request is supported by this plugin.
 func (req *RequestWrapper) SupportsProcessing() bool {
-	if !strings.Contains(req.Header.Get("Accept"), "text/html") {
-		return false
+	acceptHeader := req.Header.Get("Accept")
+	for _, monitoredType := range req.monitoring.MonitoredTypes {
+		if !strings.Contains(acceptHeader, monitoredType) {
+			return false
+		}
 	}
 
 	// Ignore non GET requests
@@ -128,7 +142,6 @@ func (req *RequestWrapper) SupportsProcessing() bool {
 	}
 
 	if strings.Contains(req.Header.Get("Upgrade"), "websocket") {
-		// log.Printf("Ignoring websocket request for %s", request.RequestURI)
 		return false
 	}
 

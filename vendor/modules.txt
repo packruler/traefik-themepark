@@ -1,4 +1,4 @@
-# github.com/packruler/plugin-utils v0.0.2
+# github.com/packruler/plugin-utils v0.0.4
 ## explicit
 github.com/packruler/plugin-utils/compressutil
 github.com/packruler/plugin-utils/httputil

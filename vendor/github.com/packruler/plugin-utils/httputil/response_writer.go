@@ -5,12 +5,12 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"strings"
 
 	"github.com/packruler/plugin-utils/compressutil"
+	"github.com/packruler/plugin-utils/logger"
 )
 
 // ResponseWrapper a wrapper used to simplify ResponseWriter data access and manipulation.
@@ -21,7 +21,24 @@ type ResponseWrapper struct {
 
 	code int `default:"200"`
 
+	logWriter  logger.LogWriter
+	monitoring MonitoringConfig
+
 	http.ResponseWriter
+}
+
+// WrapWriter create a ResponseWrapper for provided configuration.
+func WrapWriter(
+	responseWriter http.ResponseWriter,
+	monitoringConfig MonitoringConfig,
+	logWriter logger.LogWriter,
+) ResponseWrapper {
+	return ResponseWrapper{
+		logWriter:      logWriter,
+		monitoring:     monitoringConfig,
+		ResponseWriter: responseWriter,
+		lastModified:   true,
+	}
 }
 
 // WriteHeader into wrapped ResponseWriter.
@@ -75,7 +92,7 @@ func (wrapper *ResponseWrapper) SetContent(data []byte, encoding string) {
 	}
 
 	if _, err := wrapper.ResponseWriter.Write(bodyBytes); err != nil {
-		log.Printf("unable to write rewriten body: %v", err)
+		wrapper.logWriter.LogErrorf("unable to write rewriten body: %v", err)
 		wrapper.LogHeaders()
 	}
 }
@@ -86,7 +103,7 @@ func (wrapper *ResponseWrapper) getHeader(headerName string) string {
 
 // LogHeaders writes current response headers.
 func (wrapper *ResponseWrapper) LogHeaders() {
-	log.Printf("Error Headers: %v", wrapper.ResponseWriter.Header())
+	wrapper.logWriter.LogDebugf("Error Headers: %v", wrapper.ResponseWriter.Header())
 }
 
 // getContentEncoding get the Content-Encoding header value.
