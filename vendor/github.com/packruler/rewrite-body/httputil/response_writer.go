@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/packruler/plugin-utils/compressutil"
-	"github.com/packruler/plugin-utils/logger"
+	"github.com/packruler/rewrite-body/compressutil"
+	"github.com/packruler/rewrite-body/logger"
 )
 
 // ResponseWrapper a wrapper used to simplify ResponseWriter data access and manipulation.
@@ -32,12 +32,16 @@ func WrapWriter(
 	responseWriter http.ResponseWriter,
 	monitoringConfig MonitoringConfig,
 	logWriter logger.LogWriter,
-) ResponseWrapper {
-	return ResponseWrapper{
+	lastModified bool,
+) *ResponseWrapper {
+	return &ResponseWrapper{
+		buffer:         bytes.Buffer{},
+		lastModified:   lastModified,
+		wroteHeader:    false,
+		code:           http.StatusOK,
 		logWriter:      logWriter,
 		monitoring:     monitoringConfig,
 		ResponseWriter: responseWriter,
-		lastModified:   true,
 	}
 }
 
@@ -118,8 +122,19 @@ func (wrapper *ResponseWrapper) getContentType() string {
 
 // SupportsProcessing determine if HttpWrapper is supported by this plugin based on encoding.
 func (wrapper *ResponseWrapper) SupportsProcessing() bool {
+	foundContentType := false
+
 	// If content type does not match return values with false
-	if contentType := wrapper.getContentType(); contentType != "" && !strings.Contains(contentType, "text/html") {
+	contentType := wrapper.getContentType()
+	for _, monitoredType := range wrapper.monitoring.Types {
+		if strings.Contains(contentType, monitoredType) {
+			foundContentType = true
+
+			break
+		}
+	}
+
+	if !foundContentType {
 		return false
 	}
 

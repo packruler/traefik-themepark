@@ -17,10 +17,13 @@ type ReaderError struct {
 }
 
 // Decode data in a bytes.Reader based on supplied encoding.
-func Decode(byteReader *bytes.Buffer, encoding string) (data []byte, err error) {
+func Decode(byteReader *bytes.Buffer, encoding string) ([]byte, error) {
 	reader, err := getRawReader(byteReader, encoding)
 	if err != nil {
-		return nil, &ReaderError{cause: err}
+		return nil, &ReaderError{
+			error: err,
+			cause: err,
+		}
 	}
 
 	return io.ReadAll(reader)

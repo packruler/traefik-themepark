@@ -1,5 +1,6 @@
-# github.com/packruler/plugin-utils v0.0.4
+# github.com/packruler/rewrite-body v1.1.2
 ## explicit
-github.com/packruler/plugin-utils/compressutil
-github.com/packruler/plugin-utils/httputil
-github.com/packruler/plugin-utils/logger
+github.com/packruler/rewrite-body/compressutil
+github.com/packruler/rewrite-body/handler
+github.com/packruler/rewrite-body/httputil
+github.com/packruler/rewrite-body/logger

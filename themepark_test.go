@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/packruler/plugin-utils/compressutil"
+	"github.com/packruler/rewrite-body/compressutil"
 )
 
 func compressString(value string, encoding string) string {
@@ -39,6 +39,7 @@ func TestServeHTTP(t *testing.T) {
 				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
 				"<body></body>",
 			acceptContent: "text/html",
+			contentType:   "text/html",
 		},
 		{
 			desc:   "should replace </head> properly with on new line",
@@ -52,6 +53,7 @@ func TestServeHTTP(t *testing.T) {
 			` + fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") + `
 			<body></body>`,
 			acceptContent: "text/html",
+			contentType:   "text/html",
 		},
 		{
 			desc:            "should compress to gzip with proper header",
@@ -65,6 +67,7 @@ func TestServeHTTP(t *testing.T) {
 				compressutil.Gzip),
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
+			contentType:    "text/html",
 		},
 		{
 			desc:            "should compress to zlib with proper header",
@@ -77,6 +80,7 @@ func TestServeHTTP(t *testing.T) {
 			),
 			acceptEncoding: compressutil.Deflate,
 			acceptContent:  "text/html",
+			contentType:    "text/html",
 		},
 		{
 			desc:    "should not compress if not encoded from service",
@@ -87,6 +91,7 @@ func TestServeHTTP(t *testing.T) {
 				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
+			contentType:    "text/html",
 		},
 		{
 			desc:    "should use custom baseURL",
@@ -97,6 +102,7 @@ func TestServeHTTP(t *testing.T) {
 				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
+			contentType:    "text/html",
 		},
 	}
 

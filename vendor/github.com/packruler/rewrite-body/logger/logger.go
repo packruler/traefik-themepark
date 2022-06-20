@@ -13,7 +13,7 @@ type LogLevel int8
 
 const (
 	// Trace level of logs.
-	Trace LogLevel = iota
+	Trace LogLevel = iota - 2
 	// Debug level of logs.
 	Debug
 	// Info level of logs.
