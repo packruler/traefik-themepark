@@ -37,6 +37,7 @@ linters:
     - testpackage
     - paralleltest
     - tparallel
+    - nosnakecase
 issues:
   exclude-use-default: false
   max-per-linter: 0
@@ -51,6 +52,8 @@ issues:
         - goconst
         - funlen
         - godot
-    - path: themepark.go:95
+        - lll
+        - exhaustruct
+    - path: themepark.go
       linters:
-        - line-length
+        - exhaustruct

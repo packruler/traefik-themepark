@@ -26,7 +26,6 @@ func CreateConfig() *Config {
 
 // New creates and returns a new rewrite body plugin instance.
 func New(context context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-
 	handlerConfig := &handler.Config{
 		Rewrites: []handler.Rewrite{
 			{
