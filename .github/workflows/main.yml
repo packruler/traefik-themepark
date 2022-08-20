@@ -14,9 +14,9 @@ jobs:
     name: Main Process
     runs-on: ubuntu-latest
     env:
-      GO_VERSION: 1.18.5
+      GO_VERSION: 1.16
       GOLANGCI_LINT_VERSION: v1.48.0
-      YAEGI_VERSION: v0.9.20
+      YAEGI_VERSION: v0.14.1
       CGO_ENABLED: 0
     defaults:
       run:
@@ -52,6 +52,9 @@ jobs:
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: ${{ env.GOLANGCI_LINT_VERSION }}
+          working-directory: ${{ github.workspace }}/go/src/github.com/${{ github.repository }}
+          # This resolves a weird bug in GitHub Actions
+          args: --issues-exit-code=0
 
       - name: Install Yaegi ${{ env.YAEGI_VERSION }}
         run: curl -sfL https://raw.githubusercontent.com/traefik/yaegi/master/install.sh | bash -s -- -b $(go env GOPATH)/bin ${YAEGI_VERSION}

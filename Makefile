@@ -18,3 +18,6 @@ vendor:
 
 clean:
 	rm -rf ./vendor
+
+gofumpt:
+	gofumpt -l -w .
