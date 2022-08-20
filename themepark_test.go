@@ -37,6 +37,7 @@ func TestServeHTTP(t *testing.T) {
 			resBody: "<head><script></script></head><body></body>",
 			expResBody: "<head><script></script>" +
 				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				"</head>" +
 				"<body></body>",
 			acceptContent: "text/html",
 			contentType:   "text/html",
@@ -50,7 +51,8 @@ func TestServeHTTP(t *testing.T) {
 			<body></body>`,
 			expResBody: `<head>
 			<script></script>
-			` + fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") + `
+			` + fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				"</head>" + `
 			<body></body>`,
 			acceptContent: "text/html",
 			contentType:   "text/html",
@@ -63,6 +65,7 @@ func TestServeHTTP(t *testing.T) {
 			expResBody: compressString(
 				"<head><script></script>"+
 					fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+
+					"</head>"+
 					"<body></body>",
 				compressutil.Gzip),
 			acceptEncoding: compressutil.Gzip,
@@ -75,7 +78,10 @@ func TestServeHTTP(t *testing.T) {
 			contentEncoding: compressutil.Deflate,
 			resBody:         compressString("<head><script></script></head><body></body>", compressutil.Deflate),
 			expResBody: compressString(
-				"<head><script></script>"+fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+"<body></body>",
+				"<head><script></script>"+
+					fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+
+					"</head>"+
+					"<body></body>",
 				compressutil.Deflate,
 			),
 			acceptEncoding: compressutil.Deflate,
@@ -88,6 +94,7 @@ func TestServeHTTP(t *testing.T) {
 			resBody: "<head><script></script></head><body></body>",
 			expResBody: "<head><script></script>" +
 				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				"</head>" +
 				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
@@ -99,6 +106,7 @@ func TestServeHTTP(t *testing.T) {
 			resBody: "<head><script></script></head><body></body>",
 			expResBody: "<head><script></script>" +
 				fmt.Sprintf(replFormat, "http://test.com", "sonarr", "dark") +
+				"</head>" +
 				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
 			acceptContent:  "text/html",
@@ -143,6 +151,59 @@ func TestServeHTTP(t *testing.T) {
 
 			if !bytes.Equal([]byte(test.expResBody), recorder.Body.Bytes()) {
 				t.Errorf("got body: %s\n wanted: %s", recorder.Body.Bytes(), []byte(test.expResBody))
+			}
+		})
+	}
+}
+
+func TestReplacementString(t *testing.T) {
+	tests := []struct {
+		desc     string
+		config   Config
+		expected string
+	}{
+		{
+			desc:     "Nord Sonarr Theme",
+			config:   Config{App: "sonarr", Theme: "nord"},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/nord.css\"></head>",
+		},
+		{
+			desc:   "Darker Sonarr Theme (with Theme: base)",
+			config: Config{App: "sonarr", Theme: "base", Addons: []string{"darker"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/sonarr-base.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-darker/sonarr-darker.css\">" +
+				"</head>",
+		},
+		{
+			desc:   "Darker Sonarr Theme (with no theme)",
+			config: Config{App: "sonarr", Addons: []string{"darker"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/sonarr-base.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-darker/sonarr-darker.css\">" +
+				"</head>",
+		},
+		{
+			desc:   "Darker Sonarr Theme (with no theme) with 4k logo",
+			config: Config{App: "sonarr", Addons: []string{"darker", "4k-logo"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/sonarr-base.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-darker/sonarr-darker.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-4k-logo/sonarr-4k-logo.css\">" +
+				"</head>",
+		},
+		{
+			desc:   "Nord Sonarr Theme with 4k logo",
+			config: Config{App: "sonarr", Theme: "nord", Addons: []string{"4k-logo"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/nord.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-4k-logo/sonarr-4k-logo.css\">" +
+				"</head>",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			config := test.config
+
+			result := config.getReplacementString()
+			if test.expected != config.getReplacementString() {
+				t.Errorf("result: '%s' | expected: '%s'", result, test.expected)
 			}
 		})
 	}
