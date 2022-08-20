@@ -29,7 +29,7 @@ experimental:
     plugins:
         themepark:
             moduleName: "github.com/packruler/traefik-themepark"
-            version: "v1.1.0"
+            version: "v1.2.0"
 ```
 
 ### Dynamic
