@@ -64,6 +64,9 @@ http:
           # The name of the supported theme listed on https://docs.theme-park.dev/theme-options/ or https://docs.theme-park.dev/community-themes/
           theme: dark
 
+          # baseUrl is optional if you want to use a self-hosted version of theme.park
+          baseUrl: https://theme-park.domain.tld
+
           # This currently only supports '4k-logo' and 'darker' addons. Future addons that follow a similar syntax will work as well.
           # For refernce: https://docs.theme-park.dev/themes/addons/
           addons:
