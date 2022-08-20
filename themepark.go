@@ -5,16 +5,18 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/packruler/rewrite-body/handler"
 )
 
 // Config holds the plugin configuration.
 type Config struct {
-	Theme    string `json:"theme,omitempty"`
-	App      string `json:"app,omitempty"`
-	BaseURL  string `json:"baseUrl,omitempty"`
-	LogLevel int8   `json:"logLevel,omitempty"`
+	Theme    string   `json:"theme,omitempty"`
+	App      string   `json:"app,omitempty"`
+	BaseURL  string   `json:"baseUrl,omitempty"`
+	LogLevel int8     `json:"logLevel,omitempty"`
+	Addons   []string `json:"addons,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -22,22 +24,13 @@ func CreateConfig() *Config {
 	return &Config{}
 }
 
-// lint:ignore line-length
-const replFormat string = "<link " +
-	"rel=\"stylesheet\" " +
-	"type=\"text/css\" " +
-	"href=\"%s/css/base/%s/%s.css\">" +
-	"</head>"
-
 // New creates and returns a new rewrite body plugin instance.
 func New(context context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	config.validate()
-
 	handlerConfig := &handler.Config{
 		Rewrites: []handler.Rewrite{
 			{
 				Regex:       "</head>",
-				Replacement: fmt.Sprintf(replFormat, config.BaseURL, config.App, config.Theme),
+				Replacement: config.getReplacementString(),
 			},
 		},
 	}
@@ -45,8 +38,38 @@ func New(context context.Context, next http.Handler, config *Config, name string
 	return handler.New(context, next, handlerConfig, name)
 }
 
-func (config *Config) validate() {
+const replFormat string = "<link " +
+	"rel=\"stylesheet\" " +
+	"type=\"text/css\" " +
+	"href=\"%s/css/base/%s/%s.css\">"
+
+const addonFormat string = "<link " +
+	"rel=\"stylesheet\" " +
+	"type=\"text/css\" " +
+	"href=\"%s/css/addons/%s/%s-%s/%s-%s.css\">"
+
+func (config *Config) getReplacementString() string {
+	config.setDefaults()
+
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(fmt.Sprintf(replFormat, config.BaseURL, config.App, config.Theme))
+
+	for _, addon := range config.Addons {
+		stringBuilder.WriteString(fmt.Sprintf(addonFormat, config.BaseURL, config.App, config.App, addon, config.App, addon))
+	}
+
+	stringBuilder.WriteString("</head>")
+
+	return stringBuilder.String()
+}
+
+func (config *Config) setDefaults() {
 	if config.BaseURL == "" {
 		config.BaseURL = "https://theme-park.dev"
+	}
+
+	if config.Theme == "" || config.Theme == "base" {
+		config.Theme = fmt.Sprintf("%s-base", config.App)
 	}
 }

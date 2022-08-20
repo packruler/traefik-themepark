@@ -63,6 +63,25 @@ http:
 
           # The name of the supported theme listed on https://docs.theme-park.dev/theme-options/ or https://docs.theme-park.dev/community-themes/
           theme: dark
+
+          # This currently only supports '4k-logo' and 'darker' addons. Future addons that follow a similar syntax will work as well.
+          # For refernce: https://docs.theme-park.dev/themes/addons/
+          addons:
+            - 4k-logo
+    radarr-theme:
+      plugin:
+        themepark:
+          # The name of the supported application listed on https://docs.theme-park.dev/themes.
+          app: radarr
+
+          # If using the 'darker' addon the theme MUST be excluded or set to 'base'
+          theme: base
+
+          # Multiple addons can be included at the same time
+          addons:
+            - darker
+            - 4k-logo
+
   services:
     my-service:
       loadBalancer:
