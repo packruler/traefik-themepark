@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/packruler/rewrite-body/handler"
@@ -17,6 +18,7 @@ type Config struct {
 	BaseURL  string   `json:"baseUrl,omitempty"`
 	LogLevel int8     `json:"logLevel,omitempty"`
 	Addons   []string `json:"addons,omitempty"`
+	Target   string   `json:"target,omitempty"`
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -26,10 +28,12 @@ func CreateConfig() *Config {
 
 // New creates and returns a new rewrite body plugin instance.
 func New(context context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
+	config.setDefaults()
+
 	handlerConfig := &handler.Config{
 		Rewrites: []handler.Rewrite{
 			{
-				Regex:       "</head>",
+				Regex:       config.Target,
 				Replacement: config.getReplacementString(),
 			},
 		},
@@ -49,8 +53,6 @@ const addonFormat string = "<link " +
 	"href=\"%s/css/addons/%s/%s-%s/%s-%s.css\">"
 
 func (config *Config) getReplacementString() string {
-	config.setDefaults()
-
 	var stringBuilder strings.Builder
 
 	stringBuilder.WriteString(fmt.Sprintf(replFormat, config.BaseURL, config.App, config.Theme))
@@ -59,7 +61,7 @@ func (config *Config) getReplacementString() string {
 		stringBuilder.WriteString(fmt.Sprintf(addonFormat, config.BaseURL, config.App, config.App, addon, config.App, addon))
 	}
 
-	stringBuilder.WriteString("</head>")
+	stringBuilder.WriteString(config.Target)
 
 	return stringBuilder.String()
 }
@@ -72,4 +74,22 @@ func (config *Config) setDefaults() {
 	if config.Theme == "" || config.Theme == "base" {
 		config.Theme = fmt.Sprintf("%s-base", config.App)
 	}
+
+	if config.Target == "" {
+		config.Target = config.getRegexTarget()
+	}
+}
+
+const bodyBasedApps string = "(?i)" +
+	"vuetorrent" + "|" +
+	"qbittorrent" + "|" +
+	"emby"
+
+func (config *Config) getRegexTarget() string {
+	match, _ := regexp.Match(bodyBasedApps, []byte(config.App))
+	if match {
+		return "</body>"
+	}
+
+	return "</head>"
 }
