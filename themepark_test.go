@@ -140,11 +140,6 @@ func TestServeHTTP(t *testing.T) {
 
 			rewriteBody.ServeHTTP(recorder, req)
 
-			// log.Printf("Header: %v", recorder.Header())
-			// if _, exists := recorder.Result().Header["Last-Modified"]; exists != test.expLastModified {
-			// 	t.Errorf("got last-modified header %v, want %v", exists, test.expLastModified)
-			// }
-
 			if _, exists := recorder.Result().Header["Content-Length"]; exists {
 				t.Error("The Content-Length Header must be deleted")
 			}
@@ -200,10 +195,56 @@ func TestReplacementString(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
 			config := test.config
+			config.setDefaults()
 
 			result := config.getReplacementString()
 			if test.expected != config.getReplacementString() {
 				t.Errorf("result: '%s' | expected: '%s'", result, test.expected)
+			}
+		})
+	}
+}
+
+func TestRegexTarget(t *testing.T) {
+	tests := []struct {
+		desc     string
+		config   Config
+		expected string
+	}{
+		{
+			desc:     "Sonarr should be default head based",
+			config:   Config{App: "sonarr"},
+			expected: "</head>",
+		},
+		{
+			desc:     "qBittorrent should be body based",
+			config:   Config{App: "qBittorrent"},
+			expected: "</body>",
+		},
+		{
+			desc:     "VueTorrent should be body based",
+			config:   Config{App: "VueTorrent"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Emby should be body based",
+			config:   Config{App: "Emby"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Provided Target should be used",
+			config:   Config{App: "Emby", Target: "</footer>"},
+			expected: "</footer>",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			config := test.config
+			config.setDefaults()
+
+			if test.expected != config.Target {
+				t.Errorf("app: %s | result: '%s' | expected: '%s'", config.App, config.Target, test.expected)
 			}
 		})
 	}
