@@ -37,6 +37,7 @@ func New(context context.Context, next http.Handler, config *Config, name string
 				Replacement: config.getReplacementString(),
 			},
 		},
+		LogLevel: config.LogLevel,
 	}
 
 	return handler.New(context, next, handlerConfig, name)
