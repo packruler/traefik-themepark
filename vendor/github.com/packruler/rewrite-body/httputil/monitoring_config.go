@@ -1,6 +1,9 @@
 package httputil
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // MonitoringConfig structure of data for handling configuration for
 // controlling what content is monitored.
@@ -17,5 +20,16 @@ func (config *MonitoringConfig) EnsureDefaults() {
 
 	if len(config.Types) == 0 {
 		config.Types = []string{"text/html"}
+	}
+}
+
+// EnsureProperFormat handle weird yaml parsing until the underlying issue can be resolved.
+func (config *MonitoringConfig) EnsureProperFormat() {
+	if len(config.Methods) == 1 && strings.HasPrefix(config.Methods[0], "║24║") {
+		config.Methods = strings.Split(strings.ReplaceAll(config.Methods[0], "║24║", ""), "║")
+	}
+
+	if len(config.Types) == 1 && strings.HasPrefix(config.Types[0], "║24║") {
+		config.Types = strings.Split(strings.ReplaceAll(config.Types[0], "║24║", ""), "║")
 	}
 }

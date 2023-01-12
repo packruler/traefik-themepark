@@ -1,4 +1,4 @@
-# github.com/packruler/rewrite-body v1.1.2
+# github.com/packruler/rewrite-body v1.2.0
 ## explicit
 github.com/packruler/rewrite-body/compressutil
 github.com/packruler/rewrite-body/handler
