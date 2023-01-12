@@ -84,7 +84,8 @@ func (config *Config) setDefaults() {
 const bodyBasedApps string = "(?i)" +
 	"vuetorrent" + "|" +
 	"qbittorrent" + "|" +
-	"emby"
+	"emby" + "|" +
+	"jellyfin"
 
 func (config *Config) getRegexTarget() string {
 	match, _ := regexp.Match(bodyBasedApps, []byte(config.App))
