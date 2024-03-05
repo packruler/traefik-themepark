@@ -33,10 +33,10 @@ func TestServeHTTP(t *testing.T) {
 	}{
 		{
 			desc:    "should replace </head> properly with no whitespace",
-			config:  Config{App: "sonarr", Theme: "dark"},
+			config:  Config{App: "placeholder", Theme: "dark"},
 			resBody: "<head><script></script></head><body></body>",
 			expResBody: "<head><script></script>" +
-				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				fmt.Sprintf(replFormat, "https://theme-park.dev", "placeholder", "dark") +
 				"</head>" +
 				"<body></body>",
 			acceptContent: "text/html",
@@ -44,14 +44,14 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:   "should replace </head> properly with on new line",
-			config: Config{App: "sonarr", Theme: "dark"},
+			config: Config{App: "placeholder", Theme: "dark"},
 			resBody: `<head>
 			<script></script>
 			</head>
 			<body></body>`,
 			expResBody: `<head>
 			<script></script>
-			` + fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+			` + fmt.Sprintf(replFormat, "https://theme-park.dev", "placeholder", "dark") +
 				"</head>" + `
 			<body></body>`,
 			acceptContent: "text/html",
@@ -59,12 +59,12 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:            "should compress to gzip with proper header",
-			config:          Config{App: "sonarr", Theme: "dark"},
+			config:          Config{App: "placeholder", Theme: "dark"},
 			contentEncoding: compressutil.Gzip,
 			resBody:         compressString("<head><script></script></head><body></body>", compressutil.Gzip),
 			expResBody: compressString(
 				"<head><script></script>"+
-					fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+
+					fmt.Sprintf(replFormat, "https://theme-park.dev", "placeholder", "dark")+
 					"</head>"+
 					"<body></body>",
 				compressutil.Gzip),
@@ -74,12 +74,12 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:            "should compress to zlib with proper header",
-			config:          Config{App: "sonarr", Theme: "dark"},
+			config:          Config{App: "placeholder", Theme: "dark"},
 			contentEncoding: compressutil.Deflate,
 			resBody:         compressString("<head><script></script></head><body></body>", compressutil.Deflate),
 			expResBody: compressString(
 				"<head><script></script>"+
-					fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark")+
+					fmt.Sprintf(replFormat, "https://theme-park.dev", "placeholder", "dark")+
 					"</head>"+
 					"<body></body>",
 				compressutil.Deflate,
@@ -90,10 +90,10 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:    "should not compress if not encoded from service",
-			config:  Config{App: "sonarr", Theme: "dark"},
+			config:  Config{App: "placeholder", Theme: "dark"},
 			resBody: "<head><script></script></head><body></body>",
 			expResBody: "<head><script></script>" +
-				fmt.Sprintf(replFormat, "https://theme-park.dev", "sonarr", "dark") +
+				fmt.Sprintf(replFormat, "https://theme-park.dev", "placeholder", "dark") +
 				"</head>" +
 				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
@@ -102,10 +102,10 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:    "should use custom baseURL",
-			config:  Config{App: "sonarr", Theme: "dark", BaseURL: "http://test.com"},
+			config:  Config{App: "placeholder", Theme: "dark", BaseURL: "http://test.com"},
 			resBody: "<head><script></script></head><body></body>",
 			expResBody: "<head><script></script>" +
-				fmt.Sprintf(replFormat, "http://test.com", "sonarr", "dark") +
+				fmt.Sprintf(replFormat, "http://test.com", "placeholder", "dark") +
 				"</head>" +
 				"<body></body>",
 			acceptEncoding: compressutil.Gzip,
@@ -158,37 +158,37 @@ func TestReplacementString(t *testing.T) {
 		expected string
 	}{
 		{
-			desc:     "Nord Sonarr Theme",
-			config:   Config{App: "sonarr", Theme: "nord"},
-			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/nord.css\"></head>",
+			desc:     "Nord placeholder Theme",
+			config:   Config{App: "placeholder", Theme: "nord"},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/placeholder/nord.css\"></head>",
 		},
 		{
-			desc:   "Darker Sonarr Theme (with Theme: base)",
-			config: Config{App: "sonarr", Theme: "base", Addons: []string{"darker"}},
-			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/sonarr-base.css\">" +
-				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-darker/sonarr-darker.css\">" +
+			desc:   "Darker placeholder Theme (with Theme: base)",
+			config: Config{App: "placeholder", Theme: "base", Addons: []string{"darker"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/placeholder/placeholder-base.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-darker/placeholder-darker.css\">" +
 				"</head>",
 		},
 		{
-			desc:   "Darker Sonarr Theme (with no theme)",
-			config: Config{App: "sonarr", Addons: []string{"darker"}},
-			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/sonarr-base.css\">" +
-				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-darker/sonarr-darker.css\">" +
+			desc:   "Darker placeholder Theme (with no theme)",
+			config: Config{App: "placeholder", Addons: []string{"darker"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/placeholder/placeholder-base.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-darker/placeholder-darker.css\">" +
 				"</head>",
 		},
 		{
-			desc:   "Darker Sonarr Theme (with no theme) with 4k logo",
-			config: Config{App: "sonarr", Addons: []string{"darker", "4k-logo"}},
-			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/sonarr-base.css\">" +
-				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-darker/sonarr-darker.css\">" +
-				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-4k-logo/sonarr-4k-logo.css\">" +
+			desc:   "Darker placeholder Theme (with no theme) with 4k logo",
+			config: Config{App: "placeholder", Addons: []string{"darker", "4k-logo"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/placeholder/placeholder-base.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-darker/placeholder-darker.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-4k-logo/placeholder-4k-logo.css\">" +
 				"</head>",
 		},
 		{
-			desc:   "Nord Sonarr Theme with 4k logo",
-			config: Config{App: "sonarr", Theme: "nord", Addons: []string{"4k-logo"}},
-			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/sonarr/nord.css\">" +
-				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/sonarr/sonarr-4k-logo/sonarr-4k-logo.css\">" +
+			desc:   "Nord placeholder Theme with 4k logo",
+			config: Config{App: "placeholder", Theme: "nord", Addons: []string{"4k-logo"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/placeholder/nord.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-4k-logo/placeholder-4k-logo.css\">" +
 				"</head>",
 		},
 	}
@@ -212,9 +212,14 @@ func TestRegexTarget(t *testing.T) {
 		expected string
 	}{
 		{
-			desc:     "Sonarr should be default head based",
-			config:   Config{App: "sonarr"},
+			desc:     "placeholder should be default head based",
+			config:   Config{App: "placeholder"},
 			expected: "</head>",
+		},
+		{
+			desc:     "Sonarr should be body based",
+			config:   Config{App: "Sonarr"},
+			expected: "</body>",
 		},
 		{
 			desc:     "qBittorrent should be body based",
