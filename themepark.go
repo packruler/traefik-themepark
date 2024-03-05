@@ -87,7 +87,7 @@ const bodyBasedApps string = "(?i)" +
 	"emby" + "|" +
 	"jellyfin" + "|" +
 	"radarr" + "|" +
-	"prowlarr"+ "|" +
+	"prowlarr" + "|" +
 	"sonarr"
 
 func (config *Config) getRegexTarget() string {
