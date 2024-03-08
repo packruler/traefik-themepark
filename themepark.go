@@ -89,9 +89,9 @@ const bodyBasedApps string = "(?i)" +
 	"radarr" + "|" +
 	"prowlarr" + "|" +
 	"sonarr" + "|" +
-    "readarr" + "|" +
-    "lidarr" + "|" +
-    "whisparr"
+	"readarr" + "|" +
+	"lidarr" + "|" +
+	"whisparr"
 
 func (config *Config) getRegexTarget() string {
 	match, _ := regexp.Match(bodyBasedApps, []byte(config.App))
