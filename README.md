@@ -70,7 +70,7 @@ http:
           # This currently only supports '4k-logo' and 'darker' addons. Future addons that follow a similar syntax will work as well.
           # For refernce: https://docs.theme-park.dev/themes/addons/
           addons:
-            - 4k-logo
+            - sonarr-4k-logo
     radarr-theme:
       plugin:
         themepark:
@@ -82,8 +82,8 @@ http:
 
           # Multiple addons can be included at the same time
           addons:
-            - darker
-            - 4k-logo
+            - radarr-darker
+            - radarr-4k-logo
 
   services:
     my-service:
