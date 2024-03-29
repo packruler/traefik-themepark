@@ -67,7 +67,17 @@ func (config *Config) getReplacementString() string {
 		if strings.HasPrefix(addon, config.App) {
 			stringBuilder.WriteString(fmt.Sprintf(addonFormat, config.BaseURL, config.App, addon, addon))
 		} else {
-			stringBuilder.WriteString(fmt.Sprintf(addonFormatLegacy, config.BaseURL, config.App, config.App, addon, config.App, addon))
+			stringBuilder.WriteString(
+				fmt.Sprintf(
+					addonFormatLegacy,
+					config.BaseURL,
+					config.App,
+					config.App,
+					addon,
+					config.App,
+					addon,
+				),
+			)
 		}
 	}
 
