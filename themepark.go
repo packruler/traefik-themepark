@@ -48,10 +48,15 @@ const replFormat string = "<link " +
 	"type=\"text/css\" " +
 	"href=\"%s/css/base/%s/%s.css\">"
 
-const addonFormat string = "<link " +
+const addonFormatLegacy string = "<link " +
 	"rel=\"stylesheet\" " +
 	"type=\"text/css\" " +
 	"href=\"%s/css/addons/%s/%s-%s/%s-%s.css\">"
+
+const addonFormat string = "<link " +
+	"rel=\"stylesheet\" " +
+	"type=\"text/css\" " +
+	"href=\"%s/css/addons/%s/%s/%s.css\">"
 
 func (config *Config) getReplacementString() string {
 	var stringBuilder strings.Builder
@@ -59,7 +64,21 @@ func (config *Config) getReplacementString() string {
 	stringBuilder.WriteString(fmt.Sprintf(replFormat, config.BaseURL, config.App, config.Theme))
 
 	for _, addon := range config.Addons {
-		stringBuilder.WriteString(fmt.Sprintf(addonFormat, config.BaseURL, config.App, config.App, addon, config.App, addon))
+		if strings.HasPrefix(addon, config.App) {
+			stringBuilder.WriteString(fmt.Sprintf(addonFormat, config.BaseURL, config.App, addon, addon))
+		} else {
+			stringBuilder.WriteString(
+				fmt.Sprintf(
+					addonFormatLegacy,
+					config.BaseURL,
+					config.App,
+					config.App,
+					addon,
+					config.App,
+					addon,
+				),
+			)
+		}
 	}
 
 	stringBuilder.WriteString(config.Target)
