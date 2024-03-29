@@ -191,6 +191,13 @@ func TestReplacementString(t *testing.T) {
 				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-4k-logo/placeholder-4k-logo.css\">" +
 				"</head>",
 		},
+		{
+			desc:   "Nord placeholder Theme with 4k logo with placeholder name included",
+			config: Config{App: "placeholder", Theme: "nord", Addons: []string{"placeholder-4k-logo"}},
+			expected: "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/base/placeholder/nord.css\">" +
+				"<link rel=\"stylesheet\" type=\"text/css\" href=\"https://theme-park.dev/css/addons/placeholder/placeholder-4k-logo/placeholder-4k-logo.css\">" +
+				"</head>",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
