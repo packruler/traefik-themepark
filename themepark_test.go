@@ -244,6 +244,46 @@ func TestRegexTarget(t *testing.T) {
 			expected: "</body>",
 		},
 		{
+			desc:     "Jellyfin should be body based",
+			config:   Config{App: "Bazarr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Radarr should be body based",
+			config:   Config{App: "Radarr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Prowlarr should be body based",
+			config:   Config{App: "Prowlarr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Sonarr should be body based",
+			config:   Config{App: "Sonarr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Readarr should be body based",
+			config:   Config{App: "Readarr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Lidarr should be body based",
+			config:   Config{App: "Lidarr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Whisparr should be body based",
+			config:   Config{App: "Whisparr"},
+			expected: "</body>",
+		},
+		{
+			desc:     "Bazarr should be body based",
+			config:   Config{App: "Bazarr"},
+			expected: "</body>",
+		},
+		{
 			desc:     "Provided Target should be used",
 			config:   Config{App: "Emby", Target: "</footer>"},
 			expected: "</footer>",
