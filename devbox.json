@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.7/.schema/devbox.schema.json",
+  "packages": [
+    "go@latest",
+    "gofumpt@latest",
+    "golangci-lint@latest",
+    "yaegi@latest"
+  ],
+  "env": {
+    "EDITOR":     "code -w",
+    "GIT_EDITOR": "code -w",
+    "HISTDIR":    "$DEVBOX_PROJECT_ROOT/.devbox",
+    "ZSH_EXTRA_PLUGINS": "golang",
+
+    // "GOPATH": "$PWD",
+    "PATH":   "$PATH:$PWD/bin"
+  }
+}
