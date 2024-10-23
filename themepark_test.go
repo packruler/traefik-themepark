@@ -118,13 +118,13 @@ func TestServeHTTP(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			config := test.config
 
-			next := func(responseWriter http.ResponseWriter, req *http.Request) {
+			next := func(responseWriter http.ResponseWriter, _ *http.Request) {
 				responseWriter.Header().Set("Content-Encoding", test.contentEncoding)
 				responseWriter.Header().Set("Content-Type", test.contentType)
 				responseWriter.Header().Set("Content-Length", strconv.Itoa(len(test.resBody)))
 				responseWriter.WriteHeader(http.StatusOK)
 
-				_, _ = fmt.Fprintf(responseWriter, test.resBody)
+				_, _ = fmt.Fprintf(responseWriter, "%s", test.resBody)
 			}
 
 			rewriteBody, err := New(context.Background(), http.HandlerFunc(next), &config, "rewriteBody")

@@ -1,19 +1,23 @@
 run:
   timeout: 3m
-  skip-files:
-    - httputil/header/header.go
-    - apps/app_name.go
-    - themes/theme_name.go
-  skip-dirs: []
 linters-settings:
-  govet:
-    check-shadowing: false
-  golint:
-    min-confidence: 0
+  depguard:
+    rules:
+      allow_repos:
+        allow:
+          - github.com/packruler/rewrite-body/handler
+          - github.com/packruler/rewrite-body/compressutil
+          - bytes
+          - context
+          - fmt
+          - net/http
+          - net/http/httptest
+          - regexp
+          - strconv
+          - strings
+          - testing
   gocyclo:
     min-complexity: 12
-  maligned:
-    suggest-new: true
   goconst:
     min-len: 3
     min-occurrences: 4
@@ -25,22 +29,13 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    - scopelint
-    - golint
-    - interfacer
-    - maligned
     - bodyclose
-    - goerr113
     - wrapcheck
-    - maligned
-    - exhaustivestruct
     - testpackage
     - paralleltest
     - tparallel
-    - nosnakecase
 issues:
   exclude-use-default: false
-  max-per-linter: 0
   max-same-issues: 0
   exclude:
     - don't use an underscore in package name
@@ -57,3 +52,7 @@ issues:
     - path: themepark.go
       linters:
         - exhaustruct
+  exclude-files:
+    - httputil/header/header.go
+    - apps/app_name.go
+    - themes/theme_name.go
