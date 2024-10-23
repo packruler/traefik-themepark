@@ -279,11 +279,6 @@ func TestRegexTarget(t *testing.T) {
 			expected: "</body>",
 		},
 		{
-			desc:     "Bazarr should be body based",
-			config:   Config{App: "Bazarr"},
-			expected: "</body>",
-		},
-		{
 			desc:     "Provided Target should be used",
 			config:   Config{App: "Emby", Target: "</footer>"},
 			expected: "</footer>",

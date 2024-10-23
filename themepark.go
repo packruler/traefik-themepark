@@ -100,18 +100,20 @@ func (config *Config) setDefaults() {
 	}
 }
 
-const bodyBasedApps string = "(?i)" +
-	"vuetorrent" + "|" +
-	"qbittorrent" + "|" +
-	"emby" + "|" +
-	"jellyfin" + "|" +
-	"radarr" + "|" +
-	"prowlarr" + "|" +
-	"sonarr" + "|" +
-	"readarr" + "|" +
-	"lidarr" + "|" +
-	"whisparr" + "|" +
-	"bazarr"
+var bodyBasedAppsList []string = []string{
+	"vuetorrent",
+	"qbittorrent",
+	"emby",
+	"jellyfin",
+	"radarr",
+	"prowlarr",
+	"sonarr",
+	"readarr",
+	"lidarr",
+	"whisparr",
+}
+
+var bodyBasedApps string = "(?i)" + strings.Join(bodyBasedAppsList, "|")
 
 func (config *Config) getRegexTarget() string {
 	match, _ := regexp.Match(bodyBasedApps, []byte(config.App))
