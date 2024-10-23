@@ -92,7 +92,7 @@ func (config *Config) setDefaults() {
 	}
 
 	if config.Theme == "" || config.Theme == "base" {
-		config.Theme = fmt.Sprintf("%s-base", config.App)
+		config.Theme = config.App + "-base"
 	}
 
 	if config.Target == "" {
@@ -100,23 +100,25 @@ func (config *Config) setDefaults() {
 	}
 }
 
-var bodyBasedAppsList []string = []string{
-	"vuetorrent",
-	"qbittorrent",
-	"emby",
-	"jellyfin",
-	"radarr",
-	"prowlarr",
-	"sonarr",
-	"readarr",
-	"lidarr",
-	"whisparr",
+func getBodyBasedAppsRegex() string {
+	bodyBasedAppsList := []string{
+		"vuetorrent",
+		"qbittorrent",
+		"emby",
+		"jellyfin",
+		"radarr",
+		"prowlarr",
+		"sonarr",
+		"readarr",
+		"lidarr",
+		"whisparr",
+	}
+
+	return "(?i)" + strings.Join(bodyBasedAppsList, "|")
 }
 
-var bodyBasedApps string = "(?i)" + strings.Join(bodyBasedAppsList, "|")
-
 func (config *Config) getRegexTarget() string {
-	match, _ := regexp.Match(bodyBasedApps, []byte(config.App))
+	match, _ := regexp.MatchString(getBodyBasedAppsRegex(), config.App)
 	if match {
 		return "</body>"
 	}
