@@ -245,7 +245,7 @@ func TestRegexTarget(t *testing.T) {
 		},
 		{
 			desc:     "Jellyfin should be body based",
-			config:   Config{App: "Bazarr"},
+			config:   Config{App: "Jellyfin"},
 			expected: "</body>",
 		},
 		{
